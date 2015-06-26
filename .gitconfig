@@ -1,0 +1,38 @@
+[user]
+  gname = kazukgw
+  gemail = kazukgw@gmail.com
+	name = kazukgw
+	email = kazukgw@gmail.com
+[github]
+  user = kazukgw
+[core]
+  gexcludesfile = /Users/kazukgw/.gitignore_global
+  geditor = /Applications/MacVim.app/Contents/MacOS/Vim
+	excludesfile = /Users/kazukgw/.gitignore_global
+[difftool "sourcetree"]
+  gcmd = opendiff \"$LOCAL\" \"$REMOTE\"
+  gpath =
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+  gcmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+  gtrustExitCode = true
+	cmd = /opt/homebrew-cask/Caskroom/sourcetree/2.0.5.2/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[alias]
+  gst = status
+  gco = checkout
+  gcom = commit
+	st = status
+	co = checkout
+	cm = commit
+	adda = add --all
+[filter "media"]
+  gclean = git-media-clean %f
+  gsmudge = git-media-smudge %f
+[filter "hawser"]
+	clean = git hawser clean %f
+	smudge = git hawser smudge %f
+	required = true
+[ghq]
+  root = /Users/kazukgw/CloudBackup/Projects/src

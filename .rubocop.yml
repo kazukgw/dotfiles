@@ -1,0 +1,30 @@
+# Ascii 以外のコメントも使えるようにする
+Style/AsciiComments:
+  Enabled: false
+
+# ABCSize は大きめにする
+Metrics/AbcSize:
+  Max: 40
+
+# メソッドは10Line以上でもOK
+Metrics/MethodLength:
+  Enabled: false
+
+# 一行は 100文字まで。通常は80だけど
+Metrics/LineLength:
+  Max: 100
+
+# クラスにドキュメントなくてもOK
+Style/Documentation:
+  Enabled: false
+
+# class Hoge::FugaController < HogeHogeController
+# みたいな書き方もOK
+# rubocop 推奨は Nestする。
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# メソッドチェインとかの . つなぎのインデント
+# 好みじゃなかたのでOFFにした
+Style/MultilineOperationIndentation:
+  Enabled: false

@@ -1,0 +1,36 @@
+*~
+
+## npm & bower
+bower_components
+node_modules
+.sass-cache
+
+## rubymine
+.idea
+
+## sublime text
+*.sublime-project
+*.sublime-workspace
+
+## osx
+.DS_Store
+
+!.gitkeep
+!.keep
+
+## plato
+platoReport
+
+## ctags
+tags
+
+## tern.js
+.tern-project
+.watsonrc
+.watsonresults
+
+## bash
+.bash_history
+
+## pry
+.pry_history
