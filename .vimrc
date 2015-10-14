@@ -43,6 +43,8 @@ set colorcolumn=80
 set norelativenumber
 set showtabline=2
 set completeopt-=preview
+set modeline
+set modelines=4
 "}}}
 
 " Note: Skip initialization for vim-tiny or vim-small.
@@ -83,7 +85,6 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'Shougo/vimshell.vim'
   NeoBundle 'tpope/vim-fugitive'
   NeoBundle 'tpope/vim-dispatch'
-  NeoBundle 'scrooloose/nerdcommenter'
   NeoBundle 'scrooloose/nerdtree'
   NeoBundle 'scrooloose/syntastic'
   NeoBundle 'Yggdroot/indentLine'
@@ -96,7 +97,6 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'ctrlpvim/ctrlp.vim'
   NeoBundle 'mustache/vim-mustache-handlebars'
   NeoBundle 'othree/html5.vim'
-  NeoBundle 'tsukkee/unite-tag'
   NeoBundle 'gregsexton/gitv'
   NeoBundle 'kchmck/vim-coffee-script'
   NeoBundle 'majutsushi/tagbar'
@@ -104,6 +104,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'vim-ruby/vim-ruby'
   NeoBundle 'LeafCage/foldCC.vim'
   NeoBundle 'elzr/vim-json'
+  NeoBundle 'tyru/caw.vim'
 
   " ファイル・タイプ別
   " -----------------------------
@@ -112,16 +113,15 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundleLazy 'tpope/vim-rails', { "autoload": {"filetypes":["ruby"] } }
   NeoBundleLazy 'tpope/vim-endwise', { "autoload": {"filetypes":["ruby"] } }
   NeoBundleLazy 'thoughtbot/vim-rspec', { "autoload": {"filetypes":["ruby"] } }
+  " NeoBundleLazy 'marcus/rsense', { "autoload": {"filetypes":["ruby"] } }
+  " NeoBundleLazy 'supermomonga/neocomplete-rsense.vim', { "autoload": {"filetypes":["ruby"] } }
 
   " JS
-  " NeoBundleLazy 'marijnh/tern_for_vim', { "autoload": {"filetypes":["javascript"] } }
+  NeoBundleLazy 'marijnh/tern_for_vim', { "autoload": {"filetypes":["javascript"] } }
 
   " JSX
-  " NeoBundleLazy 'pangloss/vim-javascript', { "autoload": {"filetypes":["jsx"]} }
-  " NeoBundleLazy 'mxw/vim-jsx', { "autoload": {"filetypes":["jsx"]} }
-
-  NeoBundle 'pangloss/vim-javascript', { "autoload": {"filetypes":["jsx"]} }
-  NeoBundle 'mxw/vim-jsx', { "autoload": {"filetypes":["jsx"]} }
+  NeoBundleLazy 'pangloss/vim-javascript', { "autoload": {"filetypes":["jsx"]} }
+  NeoBundleLazy 'mxw/vim-jsx', { "autoload": {"filetypes":["jsx"]} }
 
   " HTML
   NeoBundleLazy 'mattn/emmet-vim', { "autoload": {"filetypes":["html","eruby"] } }
@@ -172,10 +172,14 @@ let g:neocomplete#enable_at_startup = 1
 " Use smartcase.
 let g:neocomplete#enable_smart_case = 1
 " Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 4
+let g:neocomplete#sources#syntax#min_keyword_length = 2
+let g:neocomplete#auto_completion_start_length = 2
+" 名前がパターンにmatchするbufferはcompleteしない
 let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+let g:neocomplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|tags'
 
-let g:neocomplete#sources#tags#cache_limit_size = 5000000
+" このサイズより大きいファイルではtagをcacheしない
+let g:neocomplete#sources#tags#cache_limit_size = 500000
 
 " Define dictionary.
 let g:neocomplete#sources#dictionary#dictionaries = {
@@ -212,27 +216,6 @@ inoremap <expr><C-e>  neocomplete#cancel_popup()
 " Close popup by <Space>.
 inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
 
-" For cursor moving in insert mode(Not recommended)
-"inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
-"inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
-"inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
-"inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
-" Or set this.
-"let g:neocomplete#enable_cursor_hold_i = 1
-" Or set this.
-"let g:neocomplete#enable_insert_char_pre = 1
-
-" Shell like behavior(not recommended).
-"set completeopt+=longest
-"let g:neocomplete#enable_auto_select = 1
-"let g:neocomplete#disable_auto_complete = 1
-"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
-
-let g:neocomplete#auto_completion_start_length = 3
-let g:neocomplete#enable_smart_case = 1
-let g:neocomplete#enable_underbar_completion = 1
-let g:neocomplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|tags'
-
 " Enable heavy omni completion.
 if !exists('g:neocomplete#sources#omni#input_patterns')
   let g:neocomplete#sources#omni#input_patterns = {}
@@ -247,46 +230,34 @@ let g:neocomplete#sources#omni#input_patterns.javascript = '[^. *\t]\.\w*\|\h\w*
 let g:neocomplete#sources#omni#input_patterns.objc = '[^.[:digit:] *\t]\%(\.\|->\)'
 let g:neocomplete#sources#omni#input_patterns.objcpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-let g:neocomplete#sources#omni#input_patterns.go = '\h\w\.\w*'
 
 " omni補完 force_input_pattern
 " 別プラグインと併用して使用する場合は以下の設定も行う
 if !exists('g:neocomplete#force_omni_input_patterns')
   let g:neocomplete#force_omni_input_patterns = {}
 endif
-let g:neocomplete#force_overwrite_completefunc = 1
-" let g:neocomplete#force_omni_input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)\w*'
-let g:neocomplete#force_omni_input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
-let g:neocomplete#force_omni_input_patterns.objc = '[^.[:digit:] *\t]\%(\.\|->\)\w*'
-let g:neocomplete#force_omni_input_patterns.objcpp = '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
-let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
 let g:neocomplete#force_omni_input_patterns.go = '\h\w\.\w*'
 
 " FileType毎のOmni補完を設定
-autocmd FileType python     setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType javascript setlocal omnifunc=jscomplete#CompleteJS
-autocmd FileType coffee     setlocal omnifunc=jscomplete#CompleteJS
-autocmd FileType html       setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType css        setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType xml        setlocal omnifunc=xmlcomplete#CompleteTags
-autocmd FileType php        setlocal omnifunc=phpcomplete#CompletePHP
-autocmd FileType c          setlocal omnifunc=ccomplete#Complete
 autocmd FileType ruby       setlocal omnifunc=rubycomplete#Complete
 let g:rubycomplete_rails = 0
 let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_classes_in_global = 1
 let g:rubycomplete_include_object = 1
 let g:rubycomplete_include_object_space = 1
-autocmd FileType go setlocal omnifunc=gocomplete#Complete
 
 "インクルードパスの指定
 let g:neocomplete#include_paths = {
   \ 'ruby' : '.,$HOME/.rbenv/versions/2.2.0/lib/ruby/2.2.0',
+  \ 'javascript' : '.',
+  \ 'jsx' : '.',
   \ }
 "インクルード文のパターンを指定
 let g:neocomplete#include_patterns = {
   \ 'ruby'       : '^\s*require',
   \ 'javascript' : '^\s*require',
+  \ 'jsx'        : '^\s*require',
   \ 'coffee'     : '^\s*require',
   \ }
 "インクルード先のファイル名の解析パターン
@@ -297,6 +268,7 @@ let g:neocomplete#include_exprs = {
 let g:neocomplete#include_suffixes = {
   \ 'ruby'       : '.rb',
   \ 'javascript' : '.js',
+  \ 'jsx'        : '.jsx',
   \ 'coffee'     : '.coffee',
   \ }
 """"""" }}}
@@ -530,6 +502,7 @@ let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 """ }}}
 
 
+
 """"""" NERDTree {{{
 noremap nt :NERDTreeToggle <CR>
 let NERDTreeShowHidden = 1
@@ -554,9 +527,8 @@ let g:gitgutter_eager = 0
 
 
 """"""" NERDCommenter {{{
-let NERDSpaceDelims = 1 " コメントの後に挿入するスペース
-nmap ,, <Plug>NERDCommenterToggle
-vmap ,, <Plug>NERDCommenterToggle
+nmap ,, <Plug>(caw:i:toggle)
+vmap ,, <Plug>(caw:i:toggle)
 """ }}}
 
 
@@ -655,6 +627,7 @@ let g:markdown_fenced_languages = [
 \  'sass',
 \  'xml',
 \  'go',
+\  'objc',
 \]
 """ }}}
 
@@ -710,6 +683,17 @@ set foldtext=FoldCCtext()
 set fillchars=vert:\|
 hi Folded gui=bold term=standout ctermbg=DarkGray ctermfg=DarkBlue guibg=Grey30 guifg=Grey80
 hi FoldColumn gui=bold term=standout ctermbg=DarkGrey ctermfg=DarkBlue guibg=Grey guifg=DarkBlue
+""" }}}
+
+
+
+""""""" vim-go {{{
+au FileType go nmap <Leader>ds <Plug>(go-def-split)
+au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_operators = 1
 """ }}}
 
 
@@ -796,15 +780,12 @@ function! ListSnipFiles(A, L, P)
   return splitted_and_gsubed
 endfunction
 
-command! Notep CtrlP ~/Projects/src/github.com/Note
-command! -nargs=1 Notes Ag --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note
+command! Notep CtrlP ~/Projects/src/github.com/kazukgw/Note
+command! -nargs=1 Notes Ag! --silent -m 1 --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note
 command! -nargs=1 -complete=customlist,ListNoteFiles Notee :sp ~/Projects/src/github.com/kazukgw/Note/<args>
 command! -nargs=1 -complete=customlist,ListNoteFiles Noteev :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/<args>
-
-command! Snipp CtrlP ~/Projects/src/github.com/Note/snip
-command! -nargs=1 Snips Ag --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note/snip
-command! -nargs=1 -complete=customlist,ListSnipFiles Snipe :sp ~/Projects/src/github.com/kazukgw/Note/snip/<args>
-command! -nargs=1 -complete=customlist,ListSnipFiles Snipev :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/snip/<args>
+command! Notesync :! notesync
+command! -nargs=1 Notemkdir :! mkdir ~/Projects/src/github.com/kazukgw/Note/<args>
 
 function! ListLogFiles(A, L, P)
   let filelist = expand("~/Projects/src/github.com/kazukgw/Note/log/".a:A."*")
@@ -818,8 +799,11 @@ endfunction
 
 command! Log :sp ~/Projects/src/github.com/kazukgw/Note/log/log.md
 command! Logv :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/log/log.md
+command! Logf :e ~/Projects/src/github.com/kazukgw/Note/log/log.md
 command! -nargs=1 -complete=customlist,ListLogFiles Logl :sp ~/Projects/src/github.com/kazukgw/Note/log/<args>
 command! -nargs=1 -complete=customlist,ListLogFiles Loglv :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/log/<args>
+autocmd BufNewFile,BufRead log.md,log.*.md set foldmethod=marker
+autocmd BufNewFile,BufRead log.md,log.*.md set foldlevel=0
 
 command! Todo :sp ~/Projects/src/github.com/kazukgw/Note/todo.md
 command! Todov :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/todo.md
@@ -835,6 +819,7 @@ endfunction
 
 command! -nargs=* Todos call ShowTodos(<f-args>)
 
+command! PlayGo :set ft=go | :r! cat ~/.template/quickrun_go.go
 """ }}}
 
 """"""""""""""""""""""""""""""

@@ -9,11 +9,12 @@
   gexcludesfile = /Users/kazukgw/.gitignore_global
   geditor = /Applications/MacVim.app/Contents/MacOS/Vim
 	excludesfile = /Users/kazukgw/.gitignore_global
+	quotepath = false
 [difftool "sourcetree"]
   gcmd = opendiff \"$LOCAL\" \"$REMOTE\"
   gpath =
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
+	path =
 [mergetool "sourcetree"]
   gcmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
   gtrustExitCode = true
@@ -27,6 +28,7 @@
 	co = checkout
 	cm = commit
 	adda = add --all
+  n  = now --all --stat
 [filter "media"]
   gclean = git-media-clean %f
   gsmudge = git-media-smudge %f
@@ -36,3 +38,7 @@
 	required = true
 [ghq]
   root = /Users/kazukgw/CloudBackup/Projects/src
+[filter "lfs"]
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+	required = true

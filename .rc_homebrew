@@ -1,0 +1,6 @@
+# vim: set ft=sh
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
+export NODE_PATH=`npm root -g`
+
+

@@ -1,0 +1,28 @@
+# vim: set ft=sh
+function pj() {
+  local selected=$(find ~/Projects/src -maxdepth 3 -type d | grep -o -e 'src\/.*'| peco)
+  if [ -n "$selected" ]; then
+    cd $selected
+  else
+    echo "$selected is not found..."
+  fi
+}
+
+function pjg() {
+  local selected=$(find ~/Projects/src/github.com -maxdepth 2 -type d | grep -o -e 'github\.com\/.*' | peco)
+  if [ -n "$selected" ]; then
+    cd $selected
+  else
+    echo "$selected is not found..."
+  fi
+}
+
+function pjw() {
+  local selected=$(find ~/Projects/src/github.com/winespace -maxdepth 1 -type d | grep -o -e 'winespace\/.*' | peco)
+  if [ -n "$selected" ]; then
+    cd $selected
+  else
+    echo "$selected is not found..."
+  fi
+}
+

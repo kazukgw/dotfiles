@@ -1,0 +1,6 @@
+# vim: set ft=sh
+export GOROOT=`go env GOROOT`
+export GOPATH=$HOME/CloudBackup/Projects
+PATH=$PATH:$GOROOT:$GOPATH/bin
+
+
