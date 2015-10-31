@@ -1,28 +1,53 @@
 # vim: set ft=sh
+function ff() {
+  local target=${1:-"$(pwd)"}
+  local depth=${2:-3}
+  local selected=$(find $target -maxdepth $depth -type d | peco)
+  echo $selected
+  if [ -n "$selected" ]; then
+    cd $selected
+  else
+    echo "$selected is not found..."
+  fi
+}
+
 function pj() {
-  local selected=$(find ~/Projects/src -maxdepth 3 -type d | grep -o -e 'src\/.*'| peco)
+  local selected=$(find ~/Projects/src -maxdepth 3 -type d | sed -E 's/.*Projects\/src\///g' | peco)
   if [ -n "$selected" ]; then
-    cd $selected
+    cd ~/Projects/src/$selected
   else
     echo "$selected is not found..."
   fi
 }
 
-function pjg() {
-  local selected=$(find ~/Projects/src/github.com -maxdepth 2 -type d | grep -o -e 'github\.com\/.*' | peco)
+function note() {
+  local isDir=${1}
+  local selected=""
+  if [ "$isDir" = "d" ]; then
+    $selected=$(find ~/Projects/src/github.com/kazukgw/Note -name .git -prune -o -maxdepth 3 -type d | sed -E 's/.*Projects\/src\/github.com\/kazukgw\/Note\///g' | peco)
+  else
+    $selected=$(ag ~/Projects/src/github.com/kazukgw/Note -l --nocolor --hidden --ignore ".git" -g "" | sed -E 's/.*Projects\/src\/github.com\/kazukgw\/Note\///g' | peco)
+  fi
   if [ -n "$selected" ]; then
-    cd $selected
+    cd ~/Projects/src/github.com/kazukgw/Note/$selected
   else
     echo "$selected is not found..."
   fi
 }
 
-function pjw() {
-  local selected=$(find ~/Projects/src/github.com/winespace -maxdepth 1 -type d | grep -o -e 'winespace\/.*' | peco)
+function h() {
+  local selected=$(history | awk '{$1="";print}' | sed -E 's/ +/ /g' | sort | uniq | peco)
   if [ -n "$selected" ]; then
-    cd $selected
+    echo "$selected"
+    eval "$selected"
   else
     echo "$selected is not found..."
   fi
+
 }
 
+function dict() {
+  local result=$(macdict2 -d 24 $1)
+  echo $result >> ~/.dict_history
+  echo $result
+}

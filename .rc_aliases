@@ -4,6 +4,7 @@ alias ...="cd ../.."
 alias -- -="cd -"
 alias l='ls -G -a'
 alias ls='ls -G -a'
+alias tmux='tmux -u'
 alias t='tmux'
 alias tat='tmux a -t'
 alias g='git'
@@ -15,6 +16,9 @@ alias be="bundle exec"
 alias ctags_rails='ctags --languages=ruby --exclude=".git*" --exclude="log" -R . $(bundle list --paths)'
 alias notesync='sh ~/Projects/src/github.com/kazukgw/Note/sync.sh'
 alias vassh='cd ~/Projects && vagrant ssh'
+alias vimrc='vim ~/.vimrc'
+
+alias ctags_objc="ctags --languages=objectivec --langmap=objectivec:.h.m"
 
 # 起動中のアプリ一覧
 alias lsapp="ps aux | grep -v grep | grep Applications | grep -o -e 'MacOS\/.*' | awk '{print \$1}' | sed -e 's/MacOS\///'"
@@ -23,4 +27,5 @@ alias v='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
 alias vi='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
 alias vim='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
 
-
+alias dockerm='docker-machine'
+alias dockercom='docker-compose'

@@ -2,4 +2,3 @@
 eval "$(rbenv init -)"
 PATH=$PATH:/Users/kazukgw/.rbenv/shims
 
-

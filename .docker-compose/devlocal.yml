@@ -1,0 +1,26 @@
+mysql:
+  image: tutum/mysql
+  expose:
+    - "3306"
+  volumes:
+    - ./tmp/mysql:/var/lib/mysql
+  environment:
+    MYSQL_USER: root
+    MYSQL_PASS: password
+    ON_CREATE_DB: app
+
+go1.4:
+  image: kazukgw/docker-golang:1.4-dev
+  volumes:
+    - /Users/kazukgw/Projects/src:/go/src
+
+nginx:
+  image: nginx
+  ports:
+    - "80:80"
+  command: sh /start_nginx.sh
+  volumes:
+    - ./tmp/nginx/log:/var/log/nginx
+    - ./start_nginx.sh:/start_nginx.sh
+    - ./nginx.conf.template:/nginx.conf.template
+

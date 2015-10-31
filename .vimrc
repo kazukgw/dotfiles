@@ -45,6 +45,8 @@ set showtabline=2
 set completeopt-=preview
 set modeline
 set modelines=4
+set shellcmdflag=-ic
+set clipboard=unnamed
 "}}}
 
 " Note: Skip initialization for vim-tiny or vim-small.
@@ -57,7 +59,7 @@ filetype plugin indent off
 
 
 
-""""" NeoBundle {{{
+""""" NeoBundle {K
 if has('vim_starting')
   " Required:
   set runtimepath+=~/.vim/bundle/neobundle.vim/
@@ -76,6 +78,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
         \     'unix' : 'make -f make_unix.mak',
         \    },
         \ }
+
   NeoBundle 'Shougo/unite.vim'
   NeoBundle 'Shougo/neocomplete.vim'
   NeoBundle 'Shougo/neosnippet.vim'
@@ -105,6 +108,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'LeafCage/foldCC.vim'
   NeoBundle 'elzr/vim-json'
   NeoBundle 'tyru/caw.vim'
+  NeoBundle 'mattn/ctrlp-register'
 
   " ファイル・タイプ別
   " -----------------------------
@@ -128,6 +132,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 
   " go
   NeoBundleLazy 'fatih/vim-go', { "autoload": {"filetypes":["go"] } }
+  NeoBundleLazy 'kazukgw/ctrlp-goimport', { "autoload": {"filetypes":["go"] } }
 
   " processing
   NeoBundleLazy 'sophacles/vim-processing', { "autoload":{"filetypes": ["processing"]} }
@@ -304,19 +309,6 @@ let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets,~/.vim/
 
 """"""" Unite {{{
 let g:unite_enable_start_insert=0
-noremap <Space><Space> :Unite
-" バッファ一覧
-noremap <Space>b :Unite buffer<CR>
-" ファイル一覧
-noremap <Space>f :UniteWithBufferDir -buffer-name=files file<CR>
-" 最近使ったファイルの一覧
-noremap <Space>r :Unite file_mru<CR>
-" レジスタ一覧
-noremap <Space>y :Unite -buffer-name=register register<CR>
-" ファイルとバッファ
-noremap <Space><Space><Space> :Unite buffer file_mru<CR>
-" 全部
-noremap <Space>a :Unite UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
 " session 一覧
 noremap <Space>s :Unite session<CR>
 " ESCキーを2回押すと終了する
@@ -325,7 +317,6 @@ noremap <Space>s :Unite session<CR>
 au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
 au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
 " Unite で insert mode からstart
-let g:unite_enable_start_insert=1
 """ }}}
 
 """ UniteSession {{{
@@ -474,6 +465,7 @@ function! MyCharCode()
 
   return "'". char ."' ". nr
 endfunction
+
 """ }}}
 
 
@@ -494,6 +486,10 @@ let g:indentLine_char = '¦'
 
 
 """"""" Ctrlp {{{
+nnoremap <Space>b :<c-u>CtrlPMixed<CR>
+nnoremap <Space>d :<c-u>CtrlPDir<CR>
+nnoremap <Space>r :<c-u>CtrlPRegister<CR>
+nnoremap <Space>g :<c-u>CtrlPGoImport<CR>
 if executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden --ignore ".git" -g ""'
 endif
@@ -567,6 +563,69 @@ nnoremap <C-]> g<C-]>
 noremap tb :TagbarToggle <CR>
 let g:tagbar_ctags_bin='/usr/local/bin/ctags'
 
+let g:tagbar_type_objc = {
+    \ 'ctagstype' : 'ObjectiveC',
+    \ 'kinds'     : [
+        \ 'i:interface',
+        \ 'I:implementation',
+        \ 'p:Protocol',
+        \ 'm:Object_method',
+        \ 'c:Class_method',
+        \ 'v:Global_variable',
+        \ 'F:Object field',
+        \ 'f:function',
+        \ 'p:property',
+        \ 't:type_alias',
+        \ 's:type_structure',
+        \ 'e:enumeration',
+        \ 'M:preprocessor_macro',
+    \ ],
+    \ 'sro'        : ' ',
+    \ 'kind2scope' : {
+        \ 'i' : 'interface',
+        \ 'I' : 'implementation',
+        \ 'p' : 'Protocol',
+        \ 's' : 'type_structure',
+        \ 'e' : 'enumeration'
+    \ },
+    \ 'scope2kind' : {
+        \ 'interface'      : 'i',
+        \ 'implementation' : 'I',
+        \ 'Protocol'       : 'p',
+        \ 'type_structure' : 's',
+        \ 'enumeration'    : 'e'
+    \ }
+\ }
+
+" let g:tagbar_type_objc = {
+" \  'ctagstype': 'objc'
+" \, 'ctagsargs': [
+" \   '--options='.expand('~/.vim/etc/ctags-options-objc')
+" \,  '--objc-kinds=-N'
+" \,  '--format=2'
+" \,  '--excmd=pattern'
+" \,  '--extra='
+" \,  '--fields=nksaSmte'
+" \,  '-f -'
+" \]
+" \, 'kinds': [
+" \     'i:class interface'
+" \,    'x:class extension'
+" \,    'I:class implementation'
+" \,    'P:protocol'
+" \,    'M:method'
+" \,    't:typedef'
+" \,    'v:variable'
+" \,    'p:property'
+" \,    'e:enumeration'
+" \,    'f:function'
+" \,    'd:macro'
+" \,    'g:pragma'
+" \,    'c:constant'
+" \, ]
+" \, 'sro': ' '
+" \}
+
 " for golang
 let g:tagbar_type_go = {
     \ 'ctagstype' : 'go',
@@ -628,6 +687,7 @@ let g:markdown_fenced_languages = [
 \  'xml',
 \  'go',
 \  'objc',
+\  'python',
 \]
 """ }}}
 
@@ -681,8 +741,8 @@ au BufNewFile,BufReadPost *.json set conceallevel=0
 """"""" FoldCC {{{
 set foldtext=FoldCCtext()
 set fillchars=vert:\|
-hi Folded gui=bold term=standout ctermbg=DarkGray ctermfg=DarkBlue guibg=Grey30 guifg=Grey80
-hi FoldColumn gui=bold term=standout ctermbg=DarkGrey ctermfg=DarkBlue guibg=Grey guifg=DarkBlue
+hi Folded gui=bold term=standout ctermbg=236 ctermfg=DarkBlue guibg=Grey30 guifg=Grey80
+hi FoldColumn gui=bold term=standout ctermbg=236 ctermfg=DarkBlue guibg=Grey guifg=DarkBlue
 """ }}}
 
 
@@ -698,18 +758,15 @@ let g:go_highlight_operators = 1
 
 
 
-""""""" MyAlias {{{
+""""""" MySettings {{{
+command! Vimrc :e ~/.vimrc
 command! -nargs=1 -complete=file NSS NeoSnippetSource <args>
 command! Cpc CtrlPClearAllCaches
 command! Neotags NeoCompleteTagMakeCache
 
 noremap <Space>git :Gitv --all<CR>
 noremap <Space>gitf :Gitv! --all<CR>
-""" }}}
 
-
-
-""""""" MySettings {{{
 " backupskip は backup を作らないファイルを指定するが
 " mac で crontab -e でvimを使う場合はこの設定が必要ぽい
 set backupskip=/tmp/*,/private/tmp/*
@@ -722,6 +779,12 @@ let &t_EI.="\e[2 q"
 set ttimeoutlen=10
 " 挿入モードを抜けた時にカーソルが見えなくなる現象対策(なぜかこれで治る)
 inoremap <ESC> <ESC>
+
+""" tab
+nnoremap tt :tabnew<CR>
+nnoremap tq :tabclose<CR>
+nnoremap t] gt
+nnoremap t[ gT
 
 """ 連続でインデントを操作
 vnoremap < <gv
@@ -737,7 +800,7 @@ augroup END
 nnoremap j gj
 nnoremap k gk
 nnoremap gj j
-nnoremap gk k
+nnoremap gk K
 
 """ tab文字等可視化
 " タブ文字を CTRL-I で表示し、行末に $ で表示する。（有効:list/無効:nolist）
@@ -770,15 +833,7 @@ function! ListNoteFiles(A, L, P)
   return splitted_and_gsubed
 endfunction
 
-function! ListSnipFiles(A, L, P)
-  let filelist = expand("~/Projects/src/github.com/kazukgw/Note/snip/".a:A."*")
-  if filelist =~ '\*'
-    return []
-  endif
-  let splitted = split(filelist, "\n")
-  let splitted_and_gsubed = map(splitted, "substitute(v:val, '\/Users\/kazukgw\/Projects\/src\/github\.com\/kazukgw/Note\/snip\/', '', 'g')")
-  return splitted_and_gsubed
-endfunction
+command! GoImportP CtrlP ~/Projects/src
 
 command! Notep CtrlP ~/Projects/src/github.com/kazukgw/Note
 command! -nargs=1 Notes Ag! --silent -m 1 --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note
@@ -819,7 +874,7 @@ endfunction
 
 command! -nargs=* Todos call ShowTodos(<f-args>)
 
-command! PlayGo :set ft=go | :r! cat ~/.template/quickrun_go.go
+command! PlayGo :set ft=go | :r! cat ~/.templates/quickrun_go.go
 """ }}}
 
 """"""""""""""""""""""""""""""

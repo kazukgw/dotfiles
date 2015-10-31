@@ -1,0 +1,10 @@
+#vim: set ft=sh
+
+if [[ "$(docker-machine status dev)" = "Stopped" ]]
+then
+  # docker-machine start dev
+  echo "docker machine dev is not running"
+fi
+
+# eval "$(docker-machine env dev)"
+
