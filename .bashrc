@@ -13,6 +13,9 @@ source ~/.rc_go
 source ~/.rc_homebrew
 source ~/.rc_docker
 
+export HISTCONTROL=ignoreboth
+export HISTSIZE=10000
+
 export GEM_EDITOR='/Applications/MacVim.app/Contents/MacOS/Vim'
 export TERM=xterm-color
 

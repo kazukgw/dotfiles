@@ -833,8 +833,6 @@ function! ListNoteFiles(A, L, P)
   return splitted_and_gsubed
 endfunction
 
-command! GoImportP CtrlP ~/Projects/src
-
 command! Notep CtrlP ~/Projects/src/github.com/kazukgw/Note
 command! -nargs=1 Notes Ag! --silent -m 1 --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note
 command! -nargs=1 -complete=customlist,ListNoteFiles Notee :sp ~/Projects/src/github.com/kazukgw/Note/<args>
