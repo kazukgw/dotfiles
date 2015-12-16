@@ -38,7 +38,7 @@ set hlsearch                " 検索語を強調表示
 set lazyredraw
 set foldmethod=indent
 set foldlevel=1
-set foldcolumn=3
+set foldcolumn=0
 set colorcolumn=80
 set norelativenumber
 set showtabline=2
@@ -47,6 +47,7 @@ set modeline
 set modelines=4
 set shellcmdflag=-ic
 set clipboard=unnamed
+set ambiwidth=double
 "}}}
 
 " Note: Skip initialization for vim-tiny or vim-small.
@@ -57,9 +58,7 @@ if !1 | finish | endif
 filetype off
 filetype plugin indent off
 
-
-
-""""" NeoBundle {K
+""""" NeoBundle {{{
 if has('vim_starting')
   " Required:
   set runtimepath+=~/.vim/bundle/neobundle.vim/
@@ -74,17 +73,17 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   " -----------------------------
   NeoBundle 'Shougo/vimproc.vim', {
         \ 'build' : {
-        \     'mac' : 'make -f make_mac.mak',
-        \     'unix' : 'make -f make_unix.mak',
+        \     'mac' : 'make',
+        \     'linux' : 'make',
+        \     'unix' : 'gmake',
         \    },
         \ }
 
-  NeoBundle 'Shougo/unite.vim'
   NeoBundle 'Shougo/neocomplete.vim'
-  NeoBundle 'Shougo/neosnippet.vim'
+  NeoBundle 'Shougo/neosnippet.vim', {
+    \ 'depends' : 'Shougo/vimproc.vim',
+    \}
   NeoBundle 'Shougo/neosnippet-snippets'
-  NeoBundle 'Shougo/neomru.vim'
-  NeoBundle 'Shougo/unite-session'
   NeoBundle 'Shougo/vimshell.vim'
   NeoBundle 'tpope/vim-fugitive'
   NeoBundle 'tpope/vim-dispatch'
@@ -92,6 +91,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'scrooloose/syntastic'
   NeoBundle 'Yggdroot/indentLine'
   NeoBundle 'Lokaltog/vim-easymotion'
+  " vim-gitgutter をロードするとなぜか NeoCompleteがおかしくなる、、、
   NeoBundle 'airblade/vim-gitgutter'
   NeoBundle 'itchyny/lightline.vim'
   NeoBundle 'jiangmiao/auto-pairs'
@@ -109,6 +109,9 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'elzr/vim-json'
   NeoBundle 'tyru/caw.vim'
   NeoBundle 'mattn/ctrlp-register'
+  NeoBundle 'mattn/gist-vim', {'depends': 'mattn/webapi-vim'}
+  NeoBundle 'junegunn/fzf'
+  " NeoBundle 'jacquesbh/vim-showmarks'
 
   " ファイル・タイプ別
   " -----------------------------
@@ -131,11 +134,12 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundleLazy 'mattn/emmet-vim', { "autoload": {"filetypes":["html","eruby"] } }
 
   " go
-  NeoBundleLazy 'fatih/vim-go', { "autoload": {"filetypes":["go"] } }
   NeoBundleLazy 'kazukgw/ctrlp-goimport', { "autoload": {"filetypes":["go"] } }
+  NeoBundleLazy 'fatih/vim-go', { "autoload": {"filetypes":["go"] } }
 
-  " processing
-  NeoBundleLazy 'sophacles/vim-processing', { "autoload":{"filetypes": ["processing"]} }
+  " python
+  NeoBundleLazy 'davidhalter/jedi-vim', { "autoload": {"filetypes":["python"] } }
+
 
   " コマンド呼び出し時
   " -----------------------------
@@ -177,11 +181,13 @@ let g:neocomplete#enable_at_startup = 1
 " Use smartcase.
 let g:neocomplete#enable_smart_case = 1
 " Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 2
+let g:neocomplete#sources#syntax#min_keyword_length = 4
 let g:neocomplete#auto_completion_start_length = 2
 " 名前がパターンにmatchするbufferはcompleteしない
 let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 let g:neocomplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|tags'
+" let g:neocomplete#skip_auto_completion_time = "0.5"
+let g:neocomplete#use_vimproc = 1
 
 " このサイズより大きいファイルではtagをcacheしない
 let g:neocomplete#sources#tags#cache_limit_size = 500000
@@ -194,10 +200,10 @@ let g:neocomplete#sources#dictionary#dictionaries = {
         \ }
 
 " Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+" if !exists('g:neocomplete#keyword_patterns')
+"     let g:neocomplete#keyword_patterns = {}
+" endif
+" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
@@ -238,10 +244,10 @@ let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 
 " omni補完 force_input_pattern
 " 別プラグインと併用して使用する場合は以下の設定も行う
-if !exists('g:neocomplete#force_omni_input_patterns')
-  let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.go = '\h\w\.\w*'
+" if !exists('g:neocomplete#force_omni_input_patterns')
+"   let g:neocomplete#force_omni_input_patterns = {}
+" endif
+" let g:neocomplete#force_omni_input_patterns.go = '\h\w\.\w*'
 
 " FileType毎のOmni補完を設定
 autocmd FileType javascript setlocal omnifunc=jscomplete#CompleteJS
@@ -251,6 +257,19 @@ let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_classes_in_global = 1
 let g:rubycomplete_include_object = 1
 let g:rubycomplete_include_object_space = 1
+
+
+" for python(jedi-vim)
+autocmd FileType python setlocal omnifunc=jedi#completions
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+
+if !exists('g:neocomplete#force_omni_input_patterns')
+        let g:neocomplete#force_omni_input_patterns = {}
+endif
+
+" let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
 
 "インクルードパスの指定
 let g:neocomplete#include_paths = {
@@ -276,6 +295,7 @@ let g:neocomplete#include_suffixes = {
   \ 'jsx'        : '.jsx',
   \ 'coffee'     : '.coffee',
   \ }
+
 """"""" }}}
 
 
@@ -304,27 +324,6 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 " Tell Neosnippet about the other snippets
 let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets,~/.vim/sniippets/vim-snippets/javascript'
 """"""" }}}
-
-
-
-""""""" Unite {{{
-let g:unite_enable_start_insert=0
-" session 一覧
-noremap <Space>s :Unite session<CR>
-" ESCキーを2回押すと終了する
-" autocmd で FileType が unite の時だけ
-" コマンドラインへの出力を抑制しつつ バッファローカルな keymapを設定
-au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
-au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
-" Unite で insert mode からstart
-""" }}}
-
-""" UniteSession {{{
-" autosave
-let g:unite_source_session_default_session_name = 'default'
-let g:unite_source_session_enable_auto_save = 1
-let g:unite_source_session_options = "curdir,folds"
-""" }}}
 
 
 """"""" Vimshell {{{
@@ -375,9 +374,7 @@ endfunction
 
 function! MyFilename()
   return ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
-        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
-        \  &ft == 'unite' ? unite#get_status_string() :
-        \  &ft == 'vimshell' ? substitute(b:vimshell.current_dir,expand('~'),'~','') :
+        \  (&ft == 'vimshell' ? substitute(b:vimshell.current_dir,expand('~'),'~','') :
         \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
         \ ('' != MyModified() ? ' ' . MyModified() : '')
 endfunction
@@ -486,14 +483,14 @@ let g:indentLine_char = '¦'
 
 
 """"""" Ctrlp {{{
-nnoremap <Space>b :<c-u>CtrlPMixed<CR>
-nnoremap <Space>d :<c-u>CtrlPDir<CR>
+nnoremap <Space>b :<c-u>CtrlPBuffer<CR>
+nnoremap <Space>d :<c-u>CtrlPBookmarkDir<CR>
 nnoremap <Space>r :<c-u>CtrlPRegister<CR>
 nnoremap <Space>g :<c-u>CtrlPGoImport<CR>
 if executable('ag')
-  let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden --ignore ".git" -g ""'
+  let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden --ignore-dir ".git" --ignore-dir "_workspace" -g ""'
 endif
-let g:ctrlp_custom_ignore = '.git'
+let g:ctrlp_custom_ignore = '(\.git)|(_workspace)'
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 """ }}}
 
@@ -518,6 +515,7 @@ let g:gitgutter_sign_modified = '~'
 let g:gitgutter_sign_removed = '✘'
 let g:gitgutter_realtime = 0
 let g:gitgutter_eager = 0
+let g:gitgutter_map_keys = 0
 """ }}}
 
 
@@ -706,10 +704,6 @@ let g:syntastic_rubocop_exec = '/Users/kazukgw/.rbenv/versions/2.2.1/bin/rubocop
 
 """"""" quickrun {{{
 let g:quickrun_config = {}
-let g:quickrun_config.processing =  {
-      \     'command': 'processing-java',
-      \     'exec': '%c --sketch=%s:p:h/ --output=/tmp/processing --run --force',
-      \ }
 """ }}}
 
 
@@ -750,6 +744,8 @@ hi FoldColumn gui=bold term=standout ctermbg=236 ctermfg=DarkBlue guibg=Grey gui
 """"""" vim-go {{{
 au FileType go nmap <Leader>ds <Plug>(go-def-split)
 au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
+let g:gocomplete#system_function = 'vimproc#system2'
+let g:go_autodetect_gopath = 0
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
@@ -759,6 +755,7 @@ let g:go_highlight_operators = 1
 
 
 """"""" MySettings {{{
+let mapleader = "\<Space>"
 command! Vimrc :e ~/.vimrc
 command! -nargs=1 -complete=file NSS NeoSnippetSource <args>
 command! Cpc CtrlPClearAllCaches
@@ -783,8 +780,8 @@ inoremap <ESC> <ESC>
 """ tab
 nnoremap tt :tabnew<CR>
 nnoremap tq :tabclose<CR>
-nnoremap t] gt
-nnoremap t[ gT
+nnoremap tn gt
+nnoremap tp gT
 
 """ 連続でインデントを操作
 vnoremap < <gv
@@ -819,34 +816,144 @@ autocmd BufWritePre * :%s/\s\+$//ge
 
 """ es6
 au BufNewFile,BufRead *.es6 set filetype=javascript
-""" jsx
-" au BufNewFile,BufRead *.jsx set filetype=jsx
 
-""" my note
-function! ListNoteFiles(A, L, P)
-  let filelist = expand("~/Projects/src/github.com/kazukgw/Note/".a:A."*")
+""" go
+command! PlayGo :set ft=go | :0r ~/.templates/quickrun_go.go
+
+""" fzf
+function! PjCD(e)
+  exec 'cd ' . $GOPATH . '/src/' . a:e
+endfunction
+
+function! PjCDedit_(e)
+  exec 'e ' . $GOPATH. '/src/' .a:e
+endfunction
+
+function! PjCDedit(e)
+  let dirpath = $GOPATH . '/src/' . a:e
+  call fzf#run({
+        \ 'source': 'find '. dirpath. ' -maxdepth 10 -type f | sed -E "s/.*Projects\/src\///g"',
+        \ 'sink': function('PjCDedit_')
+        \})
+endfunction
+
+command! Pj call fzf#run({
+      \ 'source': 'find ~/Projects/src -maxdepth 3 -type d | sed -E "s/.*Projects\/src\///g"',
+      \ 'sink': function('PjCD')
+      \ })
+command! Pje call fzf#run({
+      \ 'source': 'find $GOPATH/src -maxdepth 3 -type d | sed -E "s/.*Projects\/src\///g"',
+      \ 'sink': function('PjCDedit')
+      \})
+
+""" template
+function! TemplateListFile(A, L, P)
+  let filelist = expand($HOME."/.templates/".a:A."*")
   if filelist =~ '\*'
     return []
   endif
   let splitted = split(filelist, "\n")
-  let splitted_and_gsubed = map(splitted, "substitute(v:val, '\/Users\/kazukgw\/Projects\/src\/github\.com\/kazukgw/Note\/', '', 'g')")
+  let splitted_and_gsubed = map(splitted, "substitute(v:val, '.*\/\.templates\/', '', 'g')")
   return splitted_and_gsubed
+endfunction
+
+command! -nargs=1 -complete=customlist,TemplateListFile Tmpl :r ~/.templates/<args>
+
+""" }}}
+
+
+""""""" Note {{{
+let g:note_path = $GOPATH . '/src/github.com/kazukgw/Note/'
+
+function! NTopen_(e)
+  exec 'rightbelow vsplit ' . g:note_path . split(a:e, '\t')[0]
+endfunction
+
+function! NTopen(e)
+  call fzf#run({
+        \ 'source': 'nt ls -fm ' . a:e .' | sed -E "s/.*kazukgw\/Note\///g"',
+        \ 'sink': function('NTopen_')
+        \ })
+endfunction
+
+function! NTopentag(e)
+  call fzf#run({
+        \ 'source': 'nt ls -fm tag:' . a:e .' | sed -E "s/.*kazukgw\/Note\///g"',
+        \ 'sink': function('NTopen_')
+        \ })
+endfunction
+
+function! NTtaglist()
+  call fzf#run({
+        \ 'source': 'nt index ls -fm tag',
+        \ 'sink': function('NTopentag')
+        \ })
+endfunction
+
+command! -nargs=1 Notef call NTopen(<q-args>)
+command! NoteListSummary call NTopen('summary')
+command! NoteListTag call NTtaglist()
+nnoremap <Leader>nl :NoteListTag<CR>
+nnoremap <Leader>nls :NoteListSummary<CR>
+
+function! NTListFile(A, L, P)
+  let filelist = expand(g:note_path.a:A."*")
+  if filelist =~ '\*'
+    return []
+  endif
+  let splitted = split(filelist, "\n")
+  let splitted_and_gsubed = map(splitted, "substitute(v:val, '.*\/kazukgw\/Note\/', '', 'g')")
+  return splitted_and_gsubed
+endfunction
+
+function! NTnew(note)
+  let _pwd = system('pwd')
+  call system('nt new '. a:note)
+  exec 'cd '. _pwd
 endfunction
 
 command! Notep CtrlP ~/Projects/src/github.com/kazukgw/Note
 command! -nargs=1 Notes Ag! --silent -m 1 --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note
-command! -nargs=1 -complete=customlist,ListNoteFiles Notee :sp ~/Projects/src/github.com/kazukgw/Note/<args>
-command! -nargs=1 -complete=customlist,ListNoteFiles Noteev :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/<args>
+command! -nargs=1 -complete=customlist,NTListFile Notee :sp ~/Projects/src/github.com/kazukgw/Note/<args>
+command! -nargs=1 -complete=customlist,NTListFile Noteev :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/<args>
+command! -nargs=1 -complete=customlist,NTListFile Noten call NTnew(<q-args>)
 command! Notesync :! notesync
 command! -nargs=1 Notemkdir :! mkdir ~/Projects/src/github.com/kazukgw/Note/<args>
+command! NoteIndexBuild call system('nt index build')
+
+function! NTquicknote()
+  let fname = system('echo _$(date "+%Y%m%d%H%M%S").md')
+  exec 'e ' . g:note_path . '/entrance/' . fname
+endfunction
+
+function! NTquicknotev()
+  let fname = system('echo _$(date "+%Y%m%d%H%M%S").md')
+  exec 'rightbelow vsplit ' . g:note_path . '/entrance/' . fname
+endfunction
+
+function! NTquicknotes()
+  let fname = system('echo _$(date "+%Y%m%d%H%M%S").md')
+  exec 'sp ' . g:note_path . '/entrance/' . fname
+endfunction
+
+command! Noteq call NTquicknote() | :0r ~/.templates/note_frontmatter.md
+command! Noteqv call NTquicknotev() | :0r ~/.templates/note_frontmatter.md
+command! Noteqs call NTquicknotes() | :0r ~/.templates/note_frontmatter.md
+
+nnoremap <Leader>ne :Notee
+nnoremap <Leader>ns :Notes
+nnoremap <Leader>np :Notep<CR>
+nnoremap <Leader>nqf :Noteq<CR>
+nnoremap <Leader>nq :Noteqv<CR>
+nnoremap <Leader>nqs :Noteqs<CR>
 
 function! ListLogFiles(A, L, P)
-  let filelist = expand("~/Projects/src/github.com/kazukgw/Note/log/".a:A."*")
+  let filelist = expand("/Users/kazukgw/Projects/src/github.com/kazukgw/Note/log/".a:A."*")
   if filelist =~ '\*'
     return []
   endif
   let splitted = split(filelist, "\n")
-  let splitted_and_gsubed = map(splitted, "substitute(v:val, '\/Users\/kazukgw\/Projects\/src\/github\.com\/kazukgw/Note\/log\/', '', 'g')")
+  let splitted_and_gsubed = map(splitted, "substitute(v:val, '.*\/kazukgw/Note\/log\/', '', 'g')")
   return splitted_and_gsubed
 endfunction
 
@@ -855,10 +962,8 @@ command! Logv :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/log/log.
 command! Logf :e ~/Projects/src/github.com/kazukgw/Note/log/log.md
 command! -nargs=1 -complete=customlist,ListLogFiles Logl :sp ~/Projects/src/github.com/kazukgw/Note/log/<args>
 command! -nargs=1 -complete=customlist,ListLogFiles Loglv :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/log/<args>
-autocmd BufNewFile,BufRead log.md,log.*.md set foldmethod=marker
-autocmd BufNewFile,BufRead log.md,log.*.md set foldlevel=0
 
-command! Todo :sp ~/Projects/src/github.com/kazukgw/Note/todo.md
+command! Todo :sp /Users/kazukgw/Projects/src/github.com/kazukgw/Note/todo.md
 command! Todov :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/todo.md
 function! ShowTodos(...)
   let argarr = ["1", "2", "3", "4", "5", "6"]
@@ -872,8 +977,9 @@ endfunction
 
 command! -nargs=* Todos call ShowTodos(<f-args>)
 
-command! PlayGo :set ft=go | :r! cat ~/.templates/quickrun_go.go
-""" }}}
+
+" }}}
+
 
 """"""""""""""""""""""""""""""
 filetype plugin indent on

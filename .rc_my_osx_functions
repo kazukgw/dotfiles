@@ -1,0 +1,79 @@
+# vim:ft=sh
+
+function pj() {
+  local selected=$(find $PROJECTS/src -maxdepth 3 -type d | sed -E 's/.*Projects\/src\///g' | fzf)
+  if [ -n "$selected" ]; then
+    cd $PROJECTS/src/$selected
+  else
+    echo "$selected is not found..."
+  fi
+}
+
+function dict() {
+  local result=$(macdict2 -d 24 $1)
+  echo $result >> ~/.dict_history
+  echo $result
+}
+
+function new_note_dir() {
+  echo "create new note dir: "
+  while read dir; do
+    echo "$NOTEPATH/$dir"
+    echo "ok? (enter | Ctrl-c)"
+    while read confirm; do
+      mkdir -p "$NOTEPATH/$dir"
+      return
+    done
+  done
+}
+
+function new_note() {
+  echo "create new note: "
+}
+
+function note() {
+  local create_new_note="CREATE_NEW_NOTE"
+  local create_new_note_dir="CREATE_NEW_NOTE_DIR"
+  local isDir=${1}
+  local selected=""
+  if [[ "$isDir" = "d" ]]; then
+    selected=$(find $NOTEPATH \
+               -name .git -prune -o -maxdepth 3 -type d | \
+               sed -E 's/.*kazukgw\/Note\///g' | \
+               fzf_add_header $create_new_note_dir | fzf)
+  else
+    selected=$(ag ~/Projects/src/github.com/kazukgw/Note \
+               -l --nocolor --hidden --ignore ".git" -g "" | \
+               sed -E 's/.*kazukgw\/Note\///g' | \
+               fzf_add_header $create_new_note | fzf)
+  fi
+
+  local path="$NOTEPATH/$selected"
+  echo $path
+
+  if [[ $selected = "" ]]; then
+    return 0
+  fi
+
+  if [[ "$isDir" = "d" ]]; then
+    if [[ $selected = $create_new_note_dir ]]; then
+      new_note_dir
+      return 0
+    fi
+    if [[ -d $path ]]; then
+      cd $path
+    fi
+    return 0
+  fi
+
+  if [[ $selected = $create_new_note ]]; then
+    new_note
+    return 0
+  fi
+
+  if [[ -f "$path" || -L "$path" ]]; then
+    vim $path
+    return 0
+  fi
+}
+

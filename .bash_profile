@@ -1,5 +1,9 @@
 source ~/.bashrc
 
+export HISTCONTROL=ignoreboth
+export HISTSIZE=10000
+export TERM=xterm-color
+
 source ~/.git-completion
 
 #Add tab completion for many Bash commands

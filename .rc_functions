@@ -1,8 +1,31 @@
-# vim: set ft=sh
+# vim:ft=sh
+function parse_yaml () {
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("___")}
+         printf("%s%s=\"%s\"\n", vn, $2, $3);
+      }
+   }'
+   return 0
+}
+
+function fzf_add_header() {
+  echo $1
+  while read x; do
+    echo $x
+  done
+}
+
 function ff() {
   local target=${1:-"$(pwd)"}
   local depth=${2:-3}
-  local selected=$(find $target -maxdepth $depth | grep -v -e '\.git\/' | peco)
+  local selected=$(find $target -maxdepth $depth | grep -v -e '\.git\/' | fzf)
   echo $selected
   if [[ -n "$selected" ]]; then
     if [[ -d "$selected" ]]; then
@@ -15,118 +38,8 @@ function ff() {
   fi
 }
 
-function pj() {
-  local selected=$(find ~/Projects/src -maxdepth 3 -type d | sed -E 's/.*Projects\/src\///g' | peco)
-  if [ -n "$selected" ]; then
-    cd ~/Projects/src/$selected
-  else
-    echo "$selected is not found..."
-  fi
-}
-
-function add_header() {
-  echo $1
-  while read x; do
-    echo $x
-  done
-}
-
-function new_note_dir() {
-  echo "create new note dir: "
-  while read dir; do
-    echo "/Users/kazukgw/CloudBackup/Projects/src/github.com/kazukgw/Note/$dir"
-    echo "ok? (enter | Ctrl-c)"
-    while read confirm; do
-      mkdir -p "/Users/kazukgw/CloudBackup/Projects/src/github.com/kazukgw/Note/$dir"
-      return
-    done
-  done
-}
-
-function new_note() {
-  echo "create new note: "
-  while read note; do
-    echo "/Users/kazukgw/CloudBackup/Projects/src/github.com/kazukgw/Note/$note"
-    echo "ok? (enter | Ctrl-c)"
-    while read confirm; do
-      mkdir -p $(dirname "/Users/kazukgw/CloudBackup/Projects/src/github.com/kazukgw/Note/$note")
-      vim "/Users/kazukgw/CloudBackup/Projects/src/github.com/kazukgw/Note/$note"
-      return
-    done
-  done
-}
-
-function note() {
-  local create_new_note="CREATE_NEW_NOTE"
-  local create_new_note_dir="CREATE_NEW_NOTE_DIR"
-  local isDir=${1}
-  local selected=""
-  if [[ "$isDir" = "d" ]]; then
-    selected=$(find ~/Projects/src/github.com/kazukgw/Note \
-               -name .git -prune -o -maxdepth 3 -type d | \
-               sed -E 's/.*kazukgw\/Note\///g' | \
-               add_header $create_new_note_dir |
-               peco )
-  else
-    selected=$(ag ~/Projects/src/github.com/kazukgw/Note \
-               -l --nocolor --hidden --ignore ".git" -g "" | \
-               sed -E 's/.*kazukgw\/Note\///g' | \
-               add_header $create_new_note |
-               peco )
-  fi
-
-  local path="/Users/kazukgw/CloudBackup/Projects/src/github.com/kazukgw/Note/$selected"
-  echo $path
-
-  if [[ $selected = "" ]]; then
-    return 0
-  fi
-
-  if [[ "$isDir" = "d" ]]; then
-    if [[ $selected = $create_new_note_dir ]]; then
-      new_note_dir
-      return 0
-    fi
-    if [[ -d $path ]]; then
-      cd $path
-    fi
-    return 0
-  fi
-
-  if [[ $selected = $create_new_note ]]; then
-    new_note
-    return 0
-  fi
-
-  if [[ -f "$path" || -L "$path" ]]; then
-    vim $path
-    return 0
-  fi
-}
-
-function h() {
-  local selected=$(history | tail -r | awk '{$1="";print}' | sed -E 's/ +/ /g' | awk '!a[$0]++' | peco)
-  if [ -n "$selected" ]; then
-    echo "$selected"
-    eval "$selected"
-    echo "$selected" >> "$HOME/.bash_history"
-  else
-    echo "$selected is not found..."
-  fi
-}
-
-function dict() {
-  local result=$(macdict2 -d 24 $1)
-  echo $result >> ~/.dict_history
-  echo $result
-}
-
-function dmenv() {
-  eval $(docker-machine env ${1:-"dev"})
-}
-
 function agv() {
-  local selected=$(ag -s --ignore '\.git' $1 | peco)
+  local selected=$(ag -s --ignore '\.git' $1 | fzf)
   local filename=$(echo "$selected" | awk -F ':' '{print $1}')
   local line=$(echo "$selected" | awk -F ':' '{print $2}')
   if [[ -L "$filename" || -f "$filename" ]]; then
@@ -135,4 +48,9 @@ function agv() {
   else
     echo "$selected is not file..."
   fi
+}
+
+function tat() {
+  local selected=$(tmux ls | fzf | awk -F':' '{print $1}')
+  tmux a -t $selected
 }

@@ -8,14 +8,12 @@ export PATH
 
 source ~/.rc_functions
 source ~/.rc_aliases
-source ~/.rc_rbenv
+source ~/.rc_ruby
 source ~/.rc_go
 source ~/.rc_homebrew
 source ~/.rc_docker
-
-export HISTCONTROL=ignoreboth
-export HISTSIZE=10000
-
-export GEM_EDITOR='/Applications/MacVim.app/Contents/MacOS/Vim'
-export TERM=xterm-color
+source ~/.rc_my_osx_functions
+source ~/.rc_docker_functions
+source ~/.rc_python
+source ~/.rc_kazukgw
 

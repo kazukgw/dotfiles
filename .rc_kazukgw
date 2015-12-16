@@ -1,0 +1,5 @@
+# vim: set ft=sh
+export PROJECTS=$HOME/Projects
+export NOTEPATH=$GOPATH/src/github.com/kazukgw/Note
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
