@@ -85,6 +85,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
     \}
   NeoBundle 'Shougo/neosnippet-snippets'
   NeoBundle 'Shougo/vimshell.vim'
+  NeoBundle 'honza/vim-snippets'
   NeoBundle 'tpope/vim-fugitive'
   NeoBundle 'tpope/vim-dispatch'
   NeoBundle 'scrooloose/nerdtree'
@@ -98,10 +99,9 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   NeoBundle 'kana/vim-submode'
   NeoBundle 'osyo-manga/vim-over'
   NeoBundle 'ctrlpvim/ctrlp.vim'
-  NeoBundle 'mustache/vim-mustache-handlebars'
   NeoBundle 'othree/html5.vim'
   NeoBundle 'gregsexton/gitv'
-  NeoBundle 'kchmck/vim-coffee-script'
+  " NeoBundle 'cohama/agit.vim'
   NeoBundle 'majutsushi/tagbar'
   NeoBundle 'rhysd/clever-f.vim'
   NeoBundle 'vim-ruby/vim-ruby'
@@ -671,7 +671,6 @@ let g:tagbar_type_markdown = {
   \ }
 
 let g:markdown_fenced_languages = [
-\  'coffee',
 \  'css',
 \  'java',
 \  'cpp',

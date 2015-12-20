@@ -54,3 +54,11 @@ function tat() {
   local selected=$(tmux ls | fzf | awk -F':' '{print $1}')
   tmux a -t $selected
 }
+
+function ghash() {
+  git log --oneline --decorate | fzf | awk '{print $1}'
+}
+
+function gshow() {
+  git show $(ghash):$1
+}

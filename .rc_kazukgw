@@ -2,4 +2,24 @@
 export PROJECTS=$HOME/Projects
 export NOTEPATH=$GOPATH/src/github.com/kazukgw/Note
 
+function docs() {
+  find $HOME/Dropbox/Documents | egrep '\.(pdf)|(epub)|(mobi)$' | \
+    sed -e 's/.*Documents\///g' > $HOME/Dropbox/Documents/__books
+
+  if [[ -e $HOME/Dropbox/Documents/kindle_books.json ]]; then
+    cat $HOME/Dropbox/Documents/kindle_books.json | jq .[].title | \
+      sed -e 's/"//g' | sed -e 's/ /_/g' | awk '{print "kindle/" $0}' >> $HOME/Dropbox/Documents/__books
+  fi
+
+  local f=$(cat $HOME/Dropbox/Documents/__books | fzf)
+
+  if [[ -n "$f" ]]; then
+    if [[ "$f" =~ ^kindle.*$ ]]; then
+      open -a Kindle.App
+    else
+      open $HOME/Dropbox/Documents/$f
+    fi
+  fi
+}
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
