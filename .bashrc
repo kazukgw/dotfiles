@@ -8,12 +8,4 @@ export PATH
 
 source ~/.rc_functions
 source ~/.rc_aliases
-source ~/.rc_ruby
-source ~/.rc_go
-source ~/.rc_homebrew
-source ~/.rc_docker
-source ~/.rc_my_osx_functions
-source ~/.rc_docker_functions
-source ~/.rc_python
-source ~/.rc_kazukgw
 

@@ -1,5 +1,19 @@
-# vim: set ft=sh
+# vim: ft=sh
 export GEM_EDITOR='vim'
 eval "$(rbenv init -)"
 PATH=$PATH:/Users/kazukgw/.rbenv/shims
 
+function gemsdir() {
+  local ver=$(rbenv local 2>&1)
+  if [[ $lv =~ ^\d+\.\d+\.\d+\.$ ]]; then
+    echo -e "use local ruby version: $ver"
+  else
+    ver=$(rbenv global)
+  fi
+  local p="/Users/kazukgw/.rbenv/versions/${1:-$ver}/lib/ruby/gems"
+  echo -e "$p/$(ls $p | sed -n 3p)/gems"
+}
+
+function vgems() {
+  vim gemsdir
+}

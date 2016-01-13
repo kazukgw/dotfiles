@@ -1,14 +1,13 @@
 [user]
   gname = kazukgw
   gemail = kazukgw@gmail.com
-	name = kazukgw
-	email = kazukgw@gmail.com
+  name = kazukgw
+  email = kazukgw@gmail.com
 [github]
   user = kazukgw
 [core]
   gexcludesfile = /Users/kazukgw/.gitignore_global
-  geditor = /Applications/MacVim.app/Contents/MacOS/Vim
-	excludesfile = /Users/kazukgw/.gitignore_global
+  geditor = /usr/local/bin/vim
 	quotepath = false
 [difftool "sourcetree"]
   gcmd = opendiff \"$LOCAL\" \"$REMOTE\"
@@ -42,3 +41,8 @@
 	clean = git-lfs clean %f
 	smudge = git-lfs smudge %f
 	required = true
+[diff]
+[diff]
+	tool = vimdiff
+[merge]
+	tool = vimdiff

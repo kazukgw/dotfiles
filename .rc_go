@@ -1,4 +1,4 @@
-# vim: set ft=sh
+# vim: ft=sh
 export GOROOT=`go env GOROOT`
 export GOPATH=$HOME/Projects
 PATH=$PATH:$GOROOT:$GOPATH/bin

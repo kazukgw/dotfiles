@@ -77,3 +77,12 @@ function note() {
   fi
 }
 
+# function yaml2json() {
+#   if [[ -z "$2" ]]; then
+#     python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin),
+#     sys.stdout, indent=4)' < $1
+#   else
+#     python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin),
+#     sys.stdout, indent=4)' < $1 > $2
+#   fi
+# }

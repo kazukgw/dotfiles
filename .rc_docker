@@ -1,4 +1,6 @@
 #vim: set ft=sh
+#
+alias dkr=docker
 
 if [[ "$(docker-machine status dev)" = "Running" ]]
 then

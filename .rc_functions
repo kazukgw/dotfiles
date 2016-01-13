@@ -56,7 +56,7 @@ function tat() {
 }
 
 function ghash() {
-  git log --oneline --decorate | fzf | awk '{print $1}'
+  git log --oneline --decorate --all --format="%Creset%x09%C(yellow)%h%Creset %C(magenta reverse)%d%Creset %s" | fzf --ansi | awk '{print $1}'
 }
 
 function gshow() {

@@ -38,17 +38,17 @@ function dcom() {
         docker exec -it $selected /bin/bash
       fi
     ;;
-    rm )
-      local selected=$(docker-compose ps | \
-                       awk 'NR > 2 {print $1}' | \
-                       fzf_add_header $all | fzf)
-      if [[ "$selected" = "$all" ]]; then
-        docker-compose ${args[@]}
-      else
-        docker-compose ${args[@]} $selected
-      fi
-    ;;
-    kill | start | stop | restart | scale | pause | unpause | logs)
+    # rm )
+    #   local selected=$(docker-compose ps | \
+    #                    awk 'NR > 2 {print $1}' | \
+    #                    fzf_add_header $all | fzf)
+    #   if [[ "$selected" = "$all" ]]; then
+    #     docker-compose ${args[@]}
+    #   else
+    #     docker-compose ${args[@]} $selected
+    #   fi
+    # ;;
+    build | kill | start | stop | restart | scale | pause | unpause | logs | rm)
       local selected=$(parse_yaml docker-compose.yml | awk -F'___' '{print $1}' | uniq |\
                        fzf_add_header $all | fzf)
       if [[ "$selected" = "$all" ]]; then

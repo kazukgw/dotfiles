@@ -3,6 +3,7 @@ syntax on
 syntax sync minlines=200
 
 """"""" set config {{{
+set cursorline
 set t_Co=256                " 256色
 set title
 set nocompatible            " Be iMproved
@@ -48,6 +49,9 @@ set modelines=4
 set shellcmdflag=-ic
 set clipboard=unnamed
 set ambiwidth=double
+autocmd ColorScheme * highlight Visual term=reverse cterm=reverse
+let g:molokai_original=1
+colorscheme molokai
 "}}}
 
 " Note: Skip initialization for vim-tiny or vim-small.
@@ -57,6 +61,8 @@ if !1 | finish | endif
 " ファイル終端で ON にしている
 filetype off
 filetype plugin indent off
+
+let $PATH = "~/.pyenv/shims:".$PATH
 
 """"" NeoBundle {{{
 if has('vim_starting')
@@ -79,91 +85,88 @@ call neobundle#begin(expand('~/.vim/bundle/'))
         \    },
         \ }
 
-  NeoBundle 'Shougo/neocomplete.vim'
-  NeoBundle 'Shougo/neosnippet.vim', {
-    \ 'depends' : 'Shougo/vimproc.vim',
-    \}
-  NeoBundle 'Shougo/neosnippet-snippets'
-  NeoBundle 'Shougo/vimshell.vim'
-  NeoBundle 'honza/vim-snippets'
-  NeoBundle 'tpope/vim-fugitive'
-  NeoBundle 'tpope/vim-dispatch'
-  NeoBundle 'scrooloose/nerdtree'
-  NeoBundle 'scrooloose/syntastic'
-  NeoBundle 'Yggdroot/indentLine'
-  NeoBundle 'Lokaltog/vim-easymotion'
-  " vim-gitgutter をロードするとなぜか NeoCompleteがおかしくなる、、、
-  NeoBundle 'airblade/vim-gitgutter'
-  NeoBundle 'itchyny/lightline.vim'
-  NeoBundle 'jiangmiao/auto-pairs'
-  NeoBundle 'kana/vim-submode'
-  NeoBundle 'osyo-manga/vim-over'
-  NeoBundle 'ctrlpvim/ctrlp.vim'
-  NeoBundle 'othree/html5.vim'
-  NeoBundle 'gregsexton/gitv'
-  " NeoBundle 'cohama/agit.vim'
-  NeoBundle 'majutsushi/tagbar'
-  NeoBundle 'rhysd/clever-f.vim'
-  NeoBundle 'vim-ruby/vim-ruby'
-  NeoBundle 'LeafCage/foldCC.vim'
-  NeoBundle 'elzr/vim-json'
-  NeoBundle 'tyru/caw.vim'
-  NeoBundle 'mattn/ctrlp-register'
-  NeoBundle 'mattn/gist-vim', {'depends': 'mattn/webapi-vim'}
-  NeoBundle 'junegunn/fzf'
-  " NeoBundle 'jacquesbh/vim-showmarks'
+   NeoBundle 'Shougo/neocomplete.vim'
+   NeoBundle 'Shougo/neosnippet.vim', {
+     \ 'depends' : 'Shougo/vimproc.vim',
+     \}
+   NeoBundle 'Shougo/neosnippet-snippets'
+   NeoBundle 'Shougo/vimshell.vim'
+   NeoBundle 'honza/vim-snippets'
+   NeoBundle 'tpope/vim-fugitive'
+   NeoBundle 'tpope/vim-dispatch'
+   NeoBundle 'scrooloose/nerdtree'
+   NeoBundle 'scrooloose/syntastic'
+   NeoBundle 'Yggdroot/indentLine'
+   NeoBundle 'Lokaltog/vim-easymotion'
+   NeoBundle 'airblade/vim-gitgutter'
+   NeoBundle 'itchyny/lightline.vim'
+   NeoBundle 'jiangmiao/auto-pairs'
+   NeoBundle 'kana/vim-submode'
+   NeoBundle 'osyo-manga/vim-over'
+   NeoBundle 'ctrlpvim/ctrlp.vim'
+   NeoBundle 'othree/html5.vim'
+   NeoBundle 'majutsushi/tagbar'
+   NeoBundle 'rhysd/clever-f.vim'
+   NeoBundle 'LeafCage/foldCC.vim'
+   NeoBundle 'elzr/vim-json'
+   NeoBundle 'tyru/caw.vim'
+   NeoBundle 'mattn/gist-vim', {'depends': 'mattn/webapi-vim'}
+   NeoBundle 'junegunn/fzf'
 
-  " ファイル・タイプ別
-  " -----------------------------
-  " ruby
-  NeoBundleLazy 'tpope/vim-haml', { "autoload": {"filetypes":["ruby"] } }
-  NeoBundleLazy 'tpope/vim-rails', { "autoload": {"filetypes":["ruby"] } }
-  NeoBundleLazy 'tpope/vim-endwise', { "autoload": {"filetypes":["ruby"] } }
-  NeoBundleLazy 'thoughtbot/vim-rspec', { "autoload": {"filetypes":["ruby"] } }
-  " NeoBundleLazy 'marcus/rsense', { "autoload": {"filetypes":["ruby"] } }
-  " NeoBundleLazy 'supermomonga/neocomplete-rsense.vim', { "autoload": {"filetypes":["ruby"] } }
+   " ファイル・タイプ別
+   " -----------------------------
+   " ruby
+   NeoBundleLazy 'tpope/vim-haml', { "autoload": {"filetypes":["ruby"] } }
+   NeoBundleLazy 'tpope/vim-rails', { "autoload": {"filetypes":["ruby"] } }
+   NeoBundleLazy 'tpope/vim-endwise', { "autoload": {"filetypes":["ruby"] } }
+   NeoBundleLazy 'thoughtbot/vim-rspec', { "autoload": {"filetypes":["ruby"] } }
 
-  " JS
-  NeoBundleLazy 'marijnh/tern_for_vim', { "autoload": {"filetypes":["javascript"] } }
+   " JS
+   NeoBundleLazy 'marijnh/tern_for_vim', { "autoload": {"filetypes":["javascript"] } }
 
-  " JSX
-  NeoBundleLazy 'pangloss/vim-javascript', { "autoload": {"filetypes":["jsx"]} }
-  NeoBundleLazy 'mxw/vim-jsx', { "autoload": {"filetypes":["jsx"]} }
+   " JSX
+   NeoBundleLazy 'pangloss/vim-javascript', { "autoload": {"filetypes":["jsx"]} }
+   NeoBundleLazy 'mxw/vim-jsx', { "autoload": {"filetypes":["jsx"]} }
 
-  " HTML
-  NeoBundleLazy 'mattn/emmet-vim', { "autoload": {"filetypes":["html","eruby"] } }
+   " HTML
+   NeoBundleLazy 'mattn/emmet-vim', { "autoload": {"filetypes":["html","eruby"] } }
 
-  " go
-  NeoBundleLazy 'kazukgw/ctrlp-goimport', { "autoload": {"filetypes":["go"] } }
-  NeoBundleLazy 'fatih/vim-go', { "autoload": {"filetypes":["go"] } }
+   " go
+   NeoBundleLazy 'kazukgw/ctrlp-goimport', { "autoload": {"filetypes":["go"] } }
+   NeoBundleLazy 'fatih/vim-go', { "autoload": {"filetypes":["go"] } }
 
-  " python
-  NeoBundleLazy 'davidhalter/jedi-vim', { "autoload": {"filetypes":["python"] } }
+   " python
+   NeoBundleLazy 'davidhalter/jedi-vim', { "autoload": {"filetypes":["python"] } }
+   NeoBundleLazy "lambdalisue/vim-pyenv", {
+         \ "depends": ['davidhalter/jedi-vim'],
+         \ "autoload": {
+         \   "filetypes": ["python", "python3", "djangohtml"]
+         \ }}
 
 
-  " コマンド呼び出し時
-  " -----------------------------
-  NeoBundleLazy 'Chiel92/vim-autoformat', {
-        \  'autoload': { 'commands': ['AutoFormat'] }
-        \}
-  NeoBundleLazy 'junegunn/vim-easy-align', {
-        \  'autoload': { 'commands': ['EasyAlign'] }
-        \}
-  NeoBundleLazy 'koron/codic-vim', {
-        \  'autoload': { 'commands': ['Codic'] }
-        \}
-  NeoBundleLazy 'rking/ag.vim', {
-        \  'autoload': { 'commands': ['Ag'] }
-        \}
-  NeoBundleLazy 'thinca/vim-qfreplace', {
-        \  'autoload': { 'commands': ['Qfreplace'] }
-        \}
-  NeoBundleLazy 'thinca/vim-quickrun', {
-        \  'autoload': { 'commands': ['QuickRun'] }
-        \}
-  NeoBundleLazy 'vim-scripts/Align', {
-        \  'autoload': { 'commands': ['Align'] }
-        \}
+   " コマンド呼び出し時
+   " -----------------------------
+   NeoBundleLazy 'Chiel92/vim-autoformat', {
+         \  'autoload': { 'commands': ['AutoFormat'] }
+         \}
+   NeoBundleLazy 'junegunn/vim-easy-align', {
+         \  'autoload': { 'commands': ['EasyAlign'] }
+         \}
+   NeoBundleLazy 'koron/codic-vim', {
+         \  'autoload': { 'commands': ['Codic'] }
+         \}
+   NeoBundleLazy 'rking/ag.vim', {
+         \  'autoload': { 'commands': ['Ag'] }
+         \}
+   NeoBundleLazy 'thinca/vim-qfreplace', {
+         \  'autoload': { 'commands': ['Qfreplace'] }
+         \}
+   NeoBundleLazy 'thinca/vim-quickrun', {
+         \  'autoload': { 'commands': ['QuickRun'] }
+         \}
+   NeoBundleLazy 'vim-scripts/Align', {
+         \  'autoload': { 'commands': ['Align'] }
+         \}
 call neobundle#end()
 
 " If there are uninstalled bundles found on startup,
@@ -484,8 +487,6 @@ let g:indentLine_char = '¦'
 
 """"""" Ctrlp {{{
 nnoremap <Space>b :<c-u>CtrlPBuffer<CR>
-nnoremap <Space>d :<c-u>CtrlPBookmarkDir<CR>
-nnoremap <Space>r :<c-u>CtrlPRegister<CR>
 nnoremap <Space>g :<c-u>CtrlPGoImport<CR>
 if executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden --ignore-dir ".git" --ignore-dir "_workspace" -g ""'
@@ -692,11 +693,13 @@ let g:markdown_fenced_languages = [
 
 """"""" syntastic {{{
 let g:syntastic_mode_map = { 'mode': 'passive',
-            \ 'active_filetypes': ['javascript', 'ruby'] }
+            \ 'active_filetypes': ['javascript', 'ruby', 'python'] }
 let g:syntastic_javascript_checkers = ["jshint"]
 let g:syntastic_ruby_checkers = ["rubocop"]
 let g:syntastic_ruby_exec = '/Users/kazukgw/.rbenv/versions/2.2.1/bin/ruby'
 let g:syntastic_rubocop_exec = '/Users/kazukgw/.rbenv/versions/2.2.1/bin/rubocop'
+let g:syntastic_python_checkers = ["pylint"]
+let g:syntastic_pylint_exec = '/Users/kazukgw/.pyenv/versions/2.7.10/bin/pylint'
 """ }}}
 
 
@@ -775,6 +778,12 @@ let &t_EI.="\e[2 q"
 set ttimeoutlen=10
 " 挿入モードを抜けた時にカーソルが見えなくなる現象対策(なぜかこれで治る)
 inoremap <ESC> <ESC>
+" insert mode でemacs風な動き
+inoremap <C-a> <C-o>^
+inoremap <C-e> <C-o>$
+inoremap <C-f> <C-o>w
+inoremap <C-b> <C-o>b
+inoremap <C-d> <C-o>x
 
 """ tab
 nnoremap tt :tabnew<CR>
@@ -791,6 +800,12 @@ augroup grepopen
   autocmd!
   autocmd QuickFixCmdPost vimgrep cw
 augroup END
+
+""" current buffer を vimgrep
+command! -nargs=1 S exec 'vimgrep '. string(<q-args>). ' %'
+
+""" current buffer の /// or ### でコメントしている部分を vimgrep
+command! M exec 'vimgrep "\(\/\/\/\|###\)" %'
 
 """ gj(k) と j(k) を入れかえ
 nnoremap j gj
@@ -858,6 +873,105 @@ endfunction
 
 command! -nargs=1 -complete=customlist,TemplateListFile Tmpl :r ~/.templates/<args>
 
+function! StripEscSeq(str)
+  return substitute(a:str, '\v\e\[\?\d+[mhK]', '', 'g')
+endfunction
+
+""" open gems dir
+function! OpenGemsDir()
+  let gemsdir = StripEscSeq(system('echo -e $(gemsdir)'))
+  exec 'e '. gemsdir
+endfunction
+
+command! Gems call OpenGemsDir()
+
+""" open goroot
+command! GoRoot exec 'e '. $GOROOT
+
+""" python format
+command! YAPF :0,$!yapf
+command! Pystdlib2 exec 'e $HOME/.pyenv/versions/2.7.10/lib/python2.7'
+" command! Pystdlib3 exec 'e $HOME/.pyenv/versions/2.7.10/lib/python2.7'
+""" }}}
+
+
+""" cursor {{{
+" Cursor support for terminals
+" ============================
+"
+" Defaulting vertical line for insert mode and block for other modes.
+
+" TODO: Support for gnome-terminal and xterm
+
+" GUI environments don't require any action.
+if has("gui_running")
+  finish
+endif
+
+" Environments are additive so we store the current escape sequences in temp
+" vars.
+let s:si=''
+let s:ei=''
+
+" iTerm
+" -----
+
+" iTerm escape sequence for cursor shape is:
+"
+"   \<Esc>]50;CursorShape={N}\x7
+"
+" Where {N} is:
+"  - 0 for block
+"  - 1 for vertical bar
+"  - 2 for underline
+"
+" Reference:
+"   https://code.google.com/p/iterm2/wiki/ProprietaryEscapeCodes#Set_cursor_shape
+if exists('$ITERM_PROFILE')
+  let s:si="\<Esc>]50;CursorShape=1\x7"
+  let s:ei="\<Esc>]50;CursorShape=0\x7"
+endif
+
+" OS X Terminal
+" -------------
+"
+" Inspired by: http://www.damtp.cam.ac.uk/user/rbw/vim-osx-cursor.html
+"
+" Simulate cursor shapes by highlighting the current character in normal mode.
+" Terminal cursor must be set to 'Vertical line'.
+"
+" FIXME:
+"  - Cursor in empty lines are not highlighted
+"  - Match parenthesis have precedence over cursor highlight
+if $TERM_PROGRAM == 'Apple_Terminal'
+  " Turn 'cursorline' on to update cursor regularly
+  " set cursorline
+
+  " Enable Cursor highlight for term
+  highlight Cursor cterm=reverse
+
+  " Un-highlight cursor for unfocused buffers and insert mode
+  autocmd WinLeave,InsertEnter * match none /\%#/
+
+  " Highlight cursor position in other modes only for focused windows
+  autocmd BufEnter,WinEnter,InsertLeave * match Cursor /\%#/
+endif
+
+" tmux
+" ----
+"
+" tmux captures escape sequences sent from vim, so we need to forward them to
+" the emulator.
+if exists('$TMUX') && s:si != '' && s:ei != ''
+  let s:si="\<Esc>Ptmux;\<Esc>".s:si."\<Esc>\\"
+  let s:ei="\<Esc>Ptmux;\<Esc>".s:ei."\<Esc>\\"
+endif
+
+" Use escape sequencess if they where declared.
+if s:si != '' && s:ei != ''
+  let &t_SI=s:si
+  let &t_EI=s:ei
+endif
 """ }}}
 
 
@@ -921,17 +1035,17 @@ command! -nargs=1 Notemkdir :! mkdir ~/Projects/src/github.com/kazukgw/Note/<arg
 command! NoteIndexBuild call system('nt index build')
 
 function! NTquicknote()
-  let fname = system('echo _$(date "+%Y%m%d%H%M%S").md')
+  let fname = StripEscSeq(system('echo _$(date "+%Y%m%d%H%M%S").md'))
   exec 'e ' . g:note_path . '/entrance/' . fname
 endfunction
 
 function! NTquicknotev()
-  let fname = system('echo _$(date "+%Y%m%d%H%M%S").md')
+  let fname = StripEscSeq(system('echo _$(date "+%Y%m%d%H%M%S").md'))
   exec 'rightbelow vsplit ' . g:note_path . '/entrance/' . fname
 endfunction
 
 function! NTquicknotes()
-  let fname = system('echo _$(date "+%Y%m%d%H%M%S").md')
+  let fname = StripEscSeq(system('echo _$(date "+%Y%m%d%H%M%S").md'))
   exec 'sp ' . g:note_path . '/entrance/' . fname
 endfunction
 
