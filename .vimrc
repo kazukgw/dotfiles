@@ -892,7 +892,86 @@ command! GoRoot exec 'e '. $GOROOT
 command! YAPF :0,$!yapf
 command! Pystdlib2 exec 'e $HOME/.pyenv/versions/2.7.10/lib/python2.7'
 " command! Pystdlib3 exec 'e $HOME/.pyenv/versions/2.7.10/lib/python2.7'
+function! PypkgpathFn()
+python <<PYTHON
+import vim
+import codecs
+import sys
+import os
+
+pwd = vim.eval("getcwd()")
+pkg_path_file_path = '{}/.jedi-vim-pypkgpath'.format(pwd)
+
+try:
+  pkg_path_file = codecs.open(pkg_path_file_path,'r','utf-8')
+except IOError:
+  print 'Could not insert path to sys.path because pypkgpath file is not found.'
+else:
+  try:
+    for p in pkg_path_file.readlines():
+      path = '{}/{}'.format(pwd, p)
+      if not path in sys.path:
+        sys.path.insert(1, path)
+
+  finally:
+    pkg_path_file.close()
+
+  sys.stdout.write(", ".join(sys.path))
+PYTHON
+endfunction
+
+command! Pypkgpath call PypkgpathFn()
+
+""" 現在のbufferのpath
+command! Current echo @%
 """ }}}
+
+
+""" daylog {{{
+function FinishDayLog()
+  exec ':w !daylog'
+  augroup Daylog
+    autocmd!
+  augroup END
+endfunction
+
+function NewDaylog()
+  augroup Daylog
+    autocmd!
+    autocmd BufWinLeave <buffer> call FinishDayLog() | bd!
+  augroup END
+endfunction
+
+command! Dlogn :setlocal splitbelow | :new | :setf markdown | :resize 14 | call NewDaylog()
+
+function CloseDayLog()
+  augroup DaylogShow
+    autocmd!
+  augroup END
+endfunction
+
+function OpenDayLog()
+  augroup DaylogShow
+    autocmd!
+    autocmd BufWinLeave <buffer> call CloseDayLog() | bd!
+  augroup END
+endfunction
+
+command! Dlog :setlocal splitbelow | :new | :setf markdown | :resize 18
+        \ | call OpenDayLog() | :0r! daylog
+
+function DayLogTitleFn(e)
+  exec ':0r! daylogtitle "'. a:e . '"'
+endfunction
+
+command! -nargs=1 Dlogtitle :setlocal splitbelow | :new | :setf markdown | :resize 18
+      \ | call OpenDayLog() | call DayLogTitleFn(<q-args>)
+
+nnoremap <Leader>ll :Dlogn<CR>
+nnoremap <Leader>ls :Dlog<CR>
+nnoremap <Leader>lt :Dlogtitle
+
+" }}}
 
 
 """ cursor {{{

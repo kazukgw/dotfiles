@@ -1,6 +1,7 @@
 # vim: set ft=sh
 export PROJECTS=$HOME/Projects
 export NOTEPATH=$GOPATH/src/github.com/kazukgw/Note
+export DAYLOG=$GOPATH/src/github.com/kazukgw/Note/log/daylog
 
 function docs() {
   find $HOME/Dropbox/Documents | egrep '\.(pdf)|(epub)|(mobi)$' | \
@@ -20,6 +21,10 @@ function docs() {
       open $HOME/Dropbox/Documents/$f
     fi
   fi
+}
+
+function daylogtitle() {
+  daylog | daylog -filter -title $1
 }
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
