@@ -1,5 +1,6 @@
 # vim: ft=sh
-export GOROOT=`go env GOROOT`
+export GOVERSION=1.6
+export GOROOT=/usr/local/Cellar/go/$GOVERSION/libexec
 export GOPATH=$HOME/Projects
 export GO15VENDOREXPERIMENT=1
 PATH=$PATH:$GOROOT:$GOPATH/bin

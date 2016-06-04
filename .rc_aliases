@@ -22,3 +22,4 @@ alias lsapp="ps aux | grep -v grep | grep Applications | grep -o -e 'MacOS\/.*' 
 alias vi=vim
 alias v=vim
 
+alias youtube-sound="youtube-dl --extract-audio --audio-format mp3"
