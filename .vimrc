@@ -197,31 +197,22 @@ let g:neocomplete#sources#dictionary#dictionaries = {
     \ 'scheme' : $HOME.'/.gosh_completions'
         \ }
 
-" Define keyword.
-" if !exists('g:neocomplete#keyword_patterns')
-"     let g:neocomplete#keyword_patterns = {}
-" endif
-" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-" Plugin key-mappings.
-inoremap <expr><C-g>     neocomplete#undo_completion()
-inoremap <expr><C-l>     neocomplete#complete_common_string()
-
 " Recommended key-mappings.
 " <CR>: close popup and save indent.
 inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function()
   return neocomplete#close_popup() . "\<CR>"
-  " For no inserting <CR> key.
-  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
 endfunction
+
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><C-y>  neocomplete#close_popup()
 inoremap <expr><C-e>  neocomplete#cancel_popup()
+
 " Close popup by <Space>.
 inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
 
@@ -873,54 +864,21 @@ command! Pypkgpath call PypkgpathFn()
 
 """ 現在のbufferのpath
 command! Current echo @%
+
+""" https://gist.github.com/pinzolo/8168337
+""" 指定のデータをレジスタに登録する
+function! s:Clip(data)
+  let @*=a:data
+  echo "clipped: " . a:data
+endfunction
+
+" 現在開いているファイルのパスをレジスタへ
+command! -nargs=0 ClipPath call s:Clip(expand('%:p'))
+" 現在開いているファイルのファイル名をレジスタへ
+command! -nargs=0 ClipFile call s:Clip(expand('%:t'))
+" 現在開いているファイルのディレクトリパスをレジスタへ
+command! -nargs=0 ClipDir  call s:Clip(expand('%:p:h'))
 """ }}}
-
-
-""" daylog {{{
-function FinishDayLog()
-  exec ':w !daylog'
-  augroup Daylog
-    autocmd!
-  augroup END
-endfunction
-
-function NewDaylog()
-  augroup Daylog
-    autocmd!
-    autocmd BufWinLeave <buffer> call FinishDayLog() | bd!
-  augroup END
-endfunction
-
-command! Dlogn :setlocal splitbelow | :new | :setf markdown | :resize 14 | call NewDaylog()
-
-function CloseDayLog()
-  augroup DaylogShow
-    autocmd!
-  augroup END
-endfunction
-
-function OpenDayLog()
-  augroup DaylogShow
-    autocmd!
-    autocmd BufWinLeave <buffer> call CloseDayLog() | bd!
-  augroup END
-endfunction
-
-command! Dlog :setlocal splitbelow | :new | :setf markdown | :resize 18
-        \ | call OpenDayLog() | :0r! daylog
-
-function DayLogTitleFn(e)
-  exec ':0r! daylogtitle "'. a:e . '"'
-endfunction
-
-command! -nargs=1 Dlogtitle :setlocal splitbelow | :new | :setf markdown | :resize 18
-      \ | call OpenDayLog() | call DayLogTitleFn(<q-args>)
-
-nnoremap <Leader>ll :Dlogn<CR>
-nnoremap <Leader>ls :Dlog<CR>
-nnoremap <Leader>lt :Dlogtitle
-
-" }}}
 
 
 """ cursor {{{
@@ -1001,125 +959,6 @@ if s:si != '' && s:ei != ''
   let &t_EI=s:ei
 endif
 """ }}}
-
-
-""""""" Note {{{
-let g:note_path = $GOPATH . '/src/github.com/kazukgw/Note/'
-
-function! NTopen_(e)
-  exec 'rightbelow vsplit ' . g:note_path . split(a:e, '\t')[0]
-endfunction
-
-function! NTopen(e)
-  call fzf#run({
-        \ 'source': 'nt ls -fm ' . a:e .' | sed -E "s/.*kazukgw\/Note\///g"',
-        \ 'sink': function('NTopen_')
-        \ })
-endfunction
-
-function! NTopentag(e)
-  call fzf#run({
-        \ 'source': 'nt ls -fm tag:' . a:e .' | sed -E "s/.*kazukgw\/Note\///g"',
-        \ 'sink': function('NTopen_')
-        \ })
-endfunction
-
-function! NTtaglist()
-  call fzf#run({
-        \ 'source': 'nt index ls -fm tag',
-        \ 'sink': function('NTopentag')
-        \ })
-endfunction
-
-command! -nargs=1 Notef call NTopen(<q-args>)
-command! NoteListSummary call NTopen('summary')
-command! NoteListTag call NTtaglist()
-nnoremap <Leader>nl :NoteListTag<CR>
-nnoremap <Leader>nls :NoteListSummary<CR>
-
-function! NTListFile(A, L, P)
-  let filelist = expand(g:note_path.a:A."*")
-  if filelist =~ '\*'
-    return []
-  endif
-  let splitted = split(filelist, "\n")
-  let splitted_and_gsubed = map(splitted, "substitute(v:val, '.*\/kazukgw\/Note\/', '', 'g')")
-  return splitted_and_gsubed
-endfunction
-
-function! NTnew(note)
-  let _pwd = system('pwd')
-  call system('nt new '. a:note)
-  exec 'cd '. _pwd
-endfunction
-
-command! Notep CtrlP ~/Projects/src/github.com/kazukgw/Note
-command! -nargs=1 Notes Ag! --silent -m 1 --ignore-dir log <args> ~/Projects/src/github.com/kazukgw/Note
-command! -nargs=1 -complete=customlist,NTListFile Notee :sp ~/Projects/src/github.com/kazukgw/Note/<args>
-command! -nargs=1 -complete=customlist,NTListFile Noteev :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/<args>
-command! -nargs=1 -complete=customlist,NTListFile Noten call NTnew(<q-args>)
-command! Notesync :! notesync
-command! -nargs=1 Notemkdir :! mkdir ~/Projects/src/github.com/kazukgw/Note/<args>
-command! NoteIndexBuild call system('nt index build')
-
-function! NTquicknote()
-  let fname = StripEscSeq(system('echo _$(date "+%Y%m%d%H%M%S").md'))
-  exec 'e ' . g:note_path . '/entrance/' . fname
-endfunction
-
-function! NTquicknotev()
-  let fname = StripEscSeq(system('echo _$(date "+%Y%m%d%H%M%S").md'))
-  exec 'rightbelow vsplit ' . g:note_path . '/entrance/' . fname
-endfunction
-
-function! NTquicknotes()
-  let fname = StripEscSeq(system('echo _$(date "+%Y%m%d%H%M%S").md'))
-  exec 'sp ' . g:note_path . '/entrance/' . fname
-endfunction
-
-command! Noteq call NTquicknote() | :0r ~/.templates/note_frontmatter.md
-command! Noteqv call NTquicknotev() | :0r ~/.templates/note_frontmatter.md
-command! Noteqs call NTquicknotes() | :0r ~/.templates/note_frontmatter.md
-
-nnoremap <Leader>ne :Notee
-nnoremap <Leader>ns :Notes
-nnoremap <Leader>np :Notep<CR>
-nnoremap <Leader>nqf :Noteq<CR>
-nnoremap <Leader>nq :Noteqv<CR>
-nnoremap <Leader>nqs :Noteqs<CR>
-
-function! ListLogFiles(A, L, P)
-  let filelist = expand("/Users/kazukgw/Projects/src/github.com/kazukgw/Note/log/".a:A."*")
-  if filelist =~ '\*'
-    return []
-  endif
-  let splitted = split(filelist, "\n")
-  let splitted_and_gsubed = map(splitted, "substitute(v:val, '.*\/kazukgw/Note\/log\/', '', 'g')")
-  return splitted_and_gsubed
-endfunction
-
-command! Log :sp ~/Projects/src/github.com/kazukgw/Note/log/log.md
-command! Logv :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/log/log.md
-command! Logf :e ~/Projects/src/github.com/kazukgw/Note/log/log.md
-command! -nargs=1 -complete=customlist,ListLogFiles Logl :sp ~/Projects/src/github.com/kazukgw/Note/log/<args>
-command! -nargs=1 -complete=customlist,ListLogFiles Loglv :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/log/<args>
-
-command! Todo :sp /Users/kazukgw/Projects/src/github.com/kazukgw/Note/todo.md
-command! Todov :rightbelow vsplit ~/Projects/src/github.com/kazukgw/Note/todo.md
-function! ShowTodos(...)
-  let argarr = ["1", "2", "3", "4", "5", "6"]
-  if a:0 != 0
-    argarr = a:000
-  endif
-  let argstr = '/\[\(' . join(argarr, '\|') . '\)\]/'
-  let currentFile = expand('%p')
-  exe ":vimgrep" . argstr . currentFile
-endfunction
-
-command! -nargs=* Todos call ShowTodos(<f-args>)
-
-
-" }}}
 
 
 """"""""""""""""""""""""""""""

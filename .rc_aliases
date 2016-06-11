@@ -10,7 +10,7 @@ alias g='git'
 alias tig='tig --all'
 alias be="bundle exec"
 alias ctags_rails='ctags --languages=ruby --exclude=".git*" --exclude="log" -R . $(bundle list --paths)'
-alias notesync='sh $PROJECTS/src/github.com/kazukgw/Note/sync.sh'
+alias notesync='sh $PROJECTS/src/github.com/kazukgw/Note/bin/sync'
 alias vimrc='vim ~/.vimrc'
 alias say='say -v Samantha'
 
