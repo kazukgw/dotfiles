@@ -881,6 +881,58 @@ command! -nargs=0 ClipDir  call s:Clip(expand('%:p:h'))
 """ }}}
 
 
+
+""""""" Note {{{
+command! -nargs=1 -complete=file Notew exec 'w ' . $NOTEPATH . '/_entrance/' . <q-args>
+
+function! NoteEditWith(result)
+  exec 'rightbelow split '. $NOTEPATH . '/' . split(a:result, "	")[0]
+endfunction
+
+function! NoteEditvWith(result)
+  exec 'rightbelow vsplit '. $NOTEPATH . '/' . split(a:result, "	")[0]
+endfunction
+
+command! Note call fzf#run({
+      \ 'source': 'cd ' . $NOTEPATH . ' && fm ls | sed -e "s/.*kazukgw\/Note\///g"',
+      \ 'sink': function('NoteEditWith'),
+      \ 'dir': $NOTEPATH,
+      \ })
+
+command! Notev call fzf#run({
+      \ 'source': 'cd ' . $NOTEPATH . ' && fm ls | sed -e "s/.*kazukgw\/Note\///g"',
+      \ 'sink': function('NoteEditvWith'),
+      \ 'dir': $NOTEPATH,
+      \ })
+
+command! Notetag call fzf#run({
+      \ 'source': 'cd ' . $NOTEPATH . ' && fm ls tag | sed -e "s/.*kazukgw\/Note\///g"',
+      \ 'sink': function('NoteEditWith'),
+      \ 'dir': $NOTEPATH,
+      \ })
+
+command! Notetagv call fzf#run({
+      \ 'source': 'cd ' . $NOTEPATH . ' && fm ls tag | sed -e "s/.*kazukgw\/Note\///g"',
+      \ 'sink': function('NoteEditvWith'),
+      \ 'dir': $NOTEPATH,
+      \ })
+
+command! Notesummary call fzf#run({
+      \ 'source': 'cd ' . $NOTEPATH . ' && fm ls summary | sed -e "s/.*kazukgw\/Note\///g"',
+      \ 'sink': function('NoteEditWith'),
+      \ 'dir': $NOTEPATH,
+      \ })
+
+command! Notesummaryv call fzf#run({
+      \ 'source': 'cd ' . $NOTEPATH . ' && fm ls summary | sed -e "s/.*kazukgw\/Note\///g"',
+      \ 'sink': function('NoteEditvWith'),
+      \ 'dir': $NOTEPATH,
+      \ })
+
+""" }}}
+
+
+
 """ cursor {{{
 " Cursor support for terminals
 " ============================
